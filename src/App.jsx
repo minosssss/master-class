@@ -2,10 +2,7 @@ import React from "react";
 import StyledComplexButton from "./deprecated/StyledComplexButton.js";
 import styled, { createGlobalStyle } from "styled-components";
 import Router from "./Router.jsx";
-
 const GlobalStyle = createGlobalStyle`
-    @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
-    
     html, body, div, span, applet, object, iframe,
     h1, h2, h3, h4, h5, h6, p, blockquote, pre,
     a, abbr, acronym, address, big, cite, code,
@@ -23,7 +20,7 @@ const GlobalStyle = createGlobalStyle`
         padding: 0;
         border: 0;
         font-size: 100%;
-        font: inherit;
+        //font: inherit;
         vertical-align: baseline;
     }
     /* HTML5 display-role reset for older browsers */
