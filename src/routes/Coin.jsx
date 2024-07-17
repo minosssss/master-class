@@ -11,6 +11,8 @@ import styled from "styled-components";
 import { useEffect, useState } from "react";
 import Price from "./Price.jsx";
 import Chart from "./Chart.jsx";
+import { fetchCoinDetail, fetchCoinPrice } from "../api/api.js";
+import { useQuery } from "react-query";
 
 const Title = styled.h1`
   font-size: 48px;
@@ -70,40 +72,34 @@ const Tab = styled.span`
   padding: 7px 0px;
   border-radius: 10px;
   color: ${(props) =>
-    props.isActive ? props.theme.accentColor : props.theme.textColor};
+    props.active === "active"
+      ? props.theme.accentColor
+      : props.theme.textColor};
 
   a {
     display: block;
   }
 `;
 export default function Coin() {
-  const [loading, setLoading] = useState(true);
   const { state } = useLocation();
   const { coinId } = useParams();
-  const [info, setInfo] = useState({});
-  const [price, setPrice] = useState({});
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
-  useEffect(() => {
-    (async () => {
-      const infoResponse = await fetch(
-        `https://api.coinpaprika.com/v1/coins/${coinId}`,
-      );
-      const infoData = await infoResponse.json();
-      const priceResponse = await fetch(
-        `https://api.coinpaprika.com/v1/tickers/${coinId}`,
-      );
-      const priceData = await priceResponse.json();
-      setInfo(infoData);
-      setPrice(priceData);
-      setLoading(false);
-    })();
-  }, []);
+  const { isLoading: infoLoading, data: infoData } = useQuery(
+    ["detail", coinId],
+    () => fetchCoinDetail(coinId),
+  );
+  const { isLoading: priceLoading, data: priceData } = useQuery(
+    ["price", coinId],
+    () => fetchCoinPrice(coinId),
+  );
+  const loading = infoLoading || priceLoading;
+  console.log("Coin 렌더링");
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
       </Header>
       {loading ? (
@@ -113,41 +109,37 @@ export default function Coin() {
           <Overview>
             <OverviewItem>
               <span>Rank:</span>
-              <span>{info?.rank}</span>
+              <span>{infoData?.rank}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Symbol:</span>
-              <span>${info?.symbol}</span>
+              <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Open Source:</span>
-              <span>{info?.open_source ? "Yes" : "No"}</span>
+              <span>{infoData?.open_source ? "Yes" : "No"}</span>
             </OverviewItem>
           </Overview>
-          <Description>{info?.description}</Description>
+          <Description>{infoData?.description}</Description>
           <Overview>
             <OverviewItem>
               <span>Total Supply:</span>
-              <span>{price?.total_supply}</span>
+              <span>{priceData?.total_supply}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Max Supply:</span>
-              <span>{price?.max_supply}</span>
+              <span>{priceData?.max_supply}</span>
             </OverviewItem>
           </Overview>
           <Tabs>
-            <Tab isActive={chartMatch !== null}>
+            <Tab active={chartMatch !== null ? "active" : ""}>
               <Link to="chart">Chart</Link>
             </Tab>
-            <Tab isActive={priceMatch !== null}>
+            <Tab active={priceMatch !== null ? "active" : ""}>
               <Link to="price">Price</Link>
             </Tab>
           </Tabs>
           <Outlet />
-          {/*<Routes>*/}
-          {/*  <Route path="chart" element={<Chart />} />*/}
-          {/*  <Route path="price" element={<Price />} />*/}
-          {/*</Routes>*/}
         </>
       )}
     </Container>
