@@ -15,3 +15,11 @@ export function fetchCoinDetail(coinId) {
     (response) => response.json(),
   );
 }
+
+export function fetchCoinHistory(coinId) {
+  const endDate = Math.floor(Date.now() / 1000);
+  const startDate = endDate - 60 * 60 * 24 * 14;
+  return fetch(
+    `https://ohlcv-api.nomadcoders.workers.dev?coinId=${coinId}&start=${startDate}&end=${endDate}`,
+  ).then((response) => response.json());
+}
