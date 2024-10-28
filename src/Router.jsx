@@ -10,35 +10,35 @@ import Coins from "./routes/Coins.jsx";
 import Coin from "./routes/Coin.jsx";
 import Chart from "./routes/Chart.jsx";
 import Price from "./routes/Price.jsx";
-
-// const router = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: <Coins />,
-//   },
-//   {
-//     path: "/:coinId",
-//     element: <Coin />,
-//   },
-// ]);
+import LoginPage from "./routes/LoginPage.jsx";
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 
 const router = createBrowserRouter(
   [
     {
-      path: "/",
-      element: <Coins />,
+      path: "/login",
+      element: <LoginPage />, // Public login route
     },
     {
-      path: "/:coinId",
-      element: <Coin />,
+      element: <ProtectedRoute />, // Wrap all routes inside ProtectedRoute.jsx
       children: [
         {
-          path: "chart",
-          element: <Chart />,
+          path: "/",
+          element: <Coins />, // Requires authentication
         },
         {
-          path: "price",
-          element: <Price />,
+          path: "/:coinId",
+          element: <Coin />,
+          children: [
+            {
+              path: "chart",
+              element: <Chart />,
+            },
+            {
+              path: "price",
+              element: <Price />,
+            },
+          ],
         },
       ],
     },
